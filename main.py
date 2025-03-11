@@ -22,7 +22,7 @@ app = FastAPI()
 # ✅ Fix CORS issues
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://velvett-production.up.railway.app/"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
