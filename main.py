@@ -8,10 +8,8 @@ import os
 import json
 import uuid
 import logging
-from dotenv import load_dotenv
 
-# Load environment variables
-load_dotenv(dotenv_path="key.env")
+os.environ["OPENAI_API_KEY"] ="wFPpxfnM659E9V4xz7EHiO94sAInRHJBNIim4oPRrsHG2B_kwc2EkCi2o4bEflf7uPixT3BlbkFJ1KQCFSwgnIxGNi9XTcwRoKKcoWL09GQIE80hrtkJqnC7oE9GBtmnM9YzvnLoEsgX5L5uT3pugA"
 
 
 # Initialize logging
@@ -74,7 +72,7 @@ async def start_chat():
     }
     return {
         "session_id": session_id,
-        "message": "Hei, jeg er Velfie og er din digitale hjelpeassistent. Jeg er her for å hjelpe deg med å finne riktig velferdsteknologi for pasienten. Hvilke utfordringer har pasienten?"
+        "message": "Hei, jeg heter Velfie ! Jeg er din digitale hjelpeassistent for aktuell velferdsteknologi. Hvilke utfordringer har pasienten?"
     }
 
 # ✅ Process user input and provide conversational AI responses
@@ -90,7 +88,7 @@ async def analyze_user_input(input_data: UserInput):
 
     # ✅ GPT-4o system prompt: AI-en vurderer ALLE indikasjoner før anbefaling
     system_prompt = """
-    Du er en digital helseassistent kalt Velfie. Din oppgave er å hjelpe brukeren med å finne riktig velferdsteknologi.
+    Du er en digital hjelpeassistent kalt Velfie og er ekspert på velferdsteknologi. Din oppgave er å hjelpe brukeren med å finne riktig velferdsteknologi.
 
 🔹 **Steg 1: Identifiser indikasjoner fra brukerens første melding**  
    - Analyser brukerens input og identifiser **hvilke indikasjoner som allerede er nevnt**.
@@ -100,7 +98,7 @@ async def analyze_user_input(input_data: UserInput):
 🔹 **Steg 2: Still spørsmål for å dekke ALLE indikasjoner**  
    - Hvis noen indikasjoner mangler, **still spørsmål for hver tjeneste** én etter én.  
    - Still **ett spørsmål av gangen**, basert på følgende kriterier:
-   - Vær konsis når du spør.
+   - Vær konsis når du spør og det er ikke behov for å takke brukeren om svar mer enn en gang.
 
      **Indikasjoner:**
      Digitalt tilsyn: Pasienten har fallfare og har orienteringsvansker  
@@ -122,7 +120,7 @@ async def analyze_user_input(input_data: UserInput):
    - **Forklar hvorfor tilbudene passer** basert på indikasjoner.  
    - **Gi en kort beskrivelse av tjenestene.**  
    - **Det er mulig å gi anbefalinger om totalt 6 tjenester hvis indikasjonene passer**
-    
+   - ** Hvis brukeren spør om andre ting enn velferdsteknologi og helse så redirigerer du brukeren tilbake til at du kan hjelpe om velferdsteknologi**
 
 🔹 **Format for anbefaling**  
     Svar i et godt strukturert format, med små symboler for bedre lesbarhet:
@@ -163,6 +161,8 @@ async def analyze_user_input(input_data: UserInput):
     messages = [{"role": "system", "content": system_prompt}]
     messages.extend(session_data["messages"])
     messages.append({"role": "user", "content": user_text})
+
+    client = OpenAI()
 
     try:
         response = client.chat.completions.create(
