@@ -8,9 +8,7 @@ import os
 import json
 import uuid
 import logging
-
-os.environ["OPENAI_API_KEY"] ="wFPpxfnM659E9V4xz7EHiO94sAInRHJBNIim4oPRrsHG2B_kwc2EkCi2o4bEflf7uPixT3BlbkFJ1KQCFSwgnIxGNi9XTcwRoKKcoWL09GQIE80hrtkJqnC7oE9GBtmnM9YzvnLoEsgX5L5uT3pugA"
-
+from dotenv import load_dotenv
 
 # Initialize logging
 logging.basicConfig(level=logging.INFO)
@@ -29,8 +27,13 @@ app.add_middleware(
 # ✅ Serve static files
 app.mount("/assets", StaticFiles(directory="assets"), name="assets")
 
+load_dotenv()
+
+# ✅ Get API Key from environment variable
+api_key = os.getenv("OPENAI_API_KEY")
+
 # ✅ OpenAI API Client Setup
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = OpenAI(api_key=api_key)
 if not client.api_key:
     raise ValueError("OpenAI API key not found. Please set the OPENAI_API_KEY environment variable.")
 
@@ -162,7 +165,6 @@ async def analyze_user_input(input_data: UserInput):
     messages.extend(session_data["messages"])
     messages.append({"role": "user", "content": user_text})
 
-    client = OpenAI()
 
     try:
         response = client.chat.completions.create(
